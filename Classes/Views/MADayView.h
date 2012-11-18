@@ -36,6 +36,8 @@
 
 @interface MADayView : UIView {
 	UIImageView *_topBackground;
+    UIImageView *_backgroundView;
+    UIImageView *_allDayBackground;
 	UIButton *_leftArrow, *_rightArrow;
 	UILabel *_dateLabel;
 	
@@ -53,15 +55,15 @@
 	
 	UISwipeGestureRecognizer *_swipeLeftRecognizer, *_swipeRightRecognizer;
 	
-	id<MADayViewDataSource> _dataSource;
-	id<MADayViewDelegate> __unsafe_unretained _delegate;
+	id<MADayViewDataSource> __weak _dataSource;
+	id<MADayViewDelegate> __weak _delegate;
 }
 
 @property (nonatomic,assign) BOOL autoScrollToFirstEvent;
 @property (readwrite,assign) unsigned int labelFontSize;
 @property (nonatomic,copy) NSDate *day;
-@property (nonatomic,unsafe_unretained) IBOutlet id<MADayViewDataSource> dataSource;
-@property (nonatomic,unsafe_unretained) IBOutlet id<MADayViewDelegate> delegate;
+@property (nonatomic,weak) IBOutlet id<MADayViewDataSource> dataSource;
+@property (nonatomic,weak) IBOutlet id<MADayViewDelegate> delegate;
 
 - (void)reloadData;
 

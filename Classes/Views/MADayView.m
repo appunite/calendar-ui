@@ -35,16 +35,18 @@ static const unsigned int HOURS_IN_DAY                   = 25; // Beginning and 
 static const unsigned int MINUTES_IN_HOUR                = 60;
 static const unsigned int SPACE_BETWEEN_HOUR_LABELS      = 3;
 static const unsigned int DEFAULT_LABEL_FONT_SIZE        = 12;
-static const unsigned int ALL_DAY_VIEW_EMPTY_SPACE       = 3;
+static const unsigned int ALL_DAY_VIEW_EMPTY_SPACE       = 7;
 
 static NSString *TOP_BACKGROUND_IMAGE                    = @"ma_topBackground.png";
+static NSString *ALLDAY_BACKGROUND_IMAGE                    = @"ma_topBackground.png";
+static NSString *BACKGROUND_IMAGE                        = @"ma_background.png";
 static NSString *LEFT_ARROW_IMAGE                        = @"ma_leftArrow.png";
 static NSString *RIGHT_ARROW_IMAGE                       = @"ma_rightArrow.png";
 static const unsigned int ARROW_LEFT                     = 0;
 static const unsigned int ARROW_RIGHT                    = 1;
 static const unsigned int ARROW_WIDTH                    = 48;
 static const unsigned int ARROW_HEIGHT                   = 38;
-static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
+static const unsigned int TOP_BACKGROUND_HEIGHT          = 0;
 
 #define DATE_COMPONENTS (NSYearCalendarUnit| NSMonthCalendarUnit | NSDayCalendarUnit | NSWeekCalendarUnit |  NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit | NSWeekdayCalendarUnit | NSWeekdayOrdinalCalendarUnit)
 #define CURRENT_CALENDAR [NSCalendar currentCalendar]
@@ -81,6 +83,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 @property (nonatomic, strong) UIFont *textFont;
 @property (nonatomic,copy) NSDate *day;
 @property (readonly) BOOL hasAllDayEvents;
+@property (nonatomic, strong) UIImageView *backgroundView;
 
 - (void)addEvent:(MAEvent *)event;
 - (void)resetCachedData;
@@ -114,6 +117,8 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 - (void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer;
 
 @property (readonly) UIImageView *topBackground;
+@property (readonly) UIImageView *allDayBackground;
+@property (readonly) UIImageView *backgroundView;
 @property (readonly) UIButton *leftArrow;
 @property (readonly) UIButton *rightArrow;
 @property (readonly) UILabel *dateLabel;
@@ -150,7 +155,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 - (void)setupCustomInitialisation {
 	self.labelFontSize = DEFAULT_LABEL_FONT_SIZE;
 	self.day = [NSDate date];
-	
+	[self addSubview:self.backgroundView];
 	[self addSubview:self.topBackground];
 	[self addSubview:self.leftArrow];
 	[self addSubview:self.rightArrow];
@@ -158,8 +163,10 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 	
 	[self addSubview:self.scrollView];
 	
+    [self.scrollView addSubview:self.gridView];
 	[self.scrollView addSubview:self.allDayGridView];
-	[self.scrollView addSubview:self.gridView];
+	
+    [self.allDayGridView setBackgroundView:self.allDayBackground];
 	
 	[self.gridView addGestureRecognizer:self.swipeLeftRecognizer];
 	[self.gridView addGestureRecognizer:self.swipeRightRecognizer];
@@ -187,7 +194,13 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 									 CGRectGetMaxY(self.allDayGridView.bounds),
 									 CGRectGetWidth(self.bounds),
 									 [@"FOO" sizeWithFont:self.boldFont].height * SPACE_BETWEEN_HOUR_LABELS * HOURS_IN_DAY);
-	
+
+    self.backgroundView.frame = CGRectMake(CGRectGetMinX(self.bounds),
+									 CGRectGetMinY(self.bounds),
+									 CGRectGetWidth(self.bounds),
+									 self.bounds.size.height);
+
+    
 	self.scrollView.frame = CGRectMake(CGRectGetMinX(self.bounds),
 									   CGRectGetMaxY(self.topBackground.bounds),
 									   CGRectGetWidth(self.bounds),
@@ -198,11 +211,25 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 	[self.gridView setNeedsDisplay];
 }
 
+- (UIImageView *)backgroundView {
+	if (!_backgroundView) {
+		_backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:BACKGROUND_IMAGE]];
+	}
+	return _backgroundView;
+}
+
 - (UIImageView *)topBackground {
 	if (!_topBackground) {
 		_topBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:TOP_BACKGROUND_IMAGE]];
 	}
 	return _topBackground;
+}
+
+- (UIImageView *)allDayBackground {
+	if (!_allDayBackground) {
+		_allDayBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:ALLDAY_BACKGROUND_IMAGE]];
+	}
+	return _allDayBackground;
 }
 
 - (UIButton *)leftArrow {
@@ -239,7 +266,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 - (UIScrollView *)scrollView {
 	if (!_scrollView) {		
 		_scrollView = [[UIScrollView alloc] init];
-		_scrollView.backgroundColor      = [UIColor whiteColor];
+		_scrollView.backgroundColor      = [UIColor clearColor];
 		_scrollView.scrollEnabled        = TRUE;
 		_scrollView.alwaysBounceVertical = TRUE;
 	}
@@ -249,7 +276,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 - (MA_AllDayGridView *)allDayGridView {
 	if (!_allDayGridView) {
 		_allDayGridView = [[MA_AllDayGridView alloc] init];
-		_allDayGridView.backgroundColor = [UIColor whiteColor];
+		_allDayGridView.backgroundColor = [UIColor clearColor];
 		_allDayGridView.dayView = self;
 		_allDayGridView.textFont = self.boldFont;
 		_allDayGridView.eventHeight = [@"FOO" sizeWithFont:self.regularFont].height * 2.f;
@@ -260,7 +287,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 - (MADayGridView *)gridView {
 	if (!_gridView){
 		_gridView = [[MADayGridView alloc] init];
-		_gridView.backgroundColor = [UIColor whiteColor];
+		_gridView.backgroundColor = [UIColor clearColor];
 		_gridView.textFont = self.boldFont;
 		_gridView.textColor = [UIColor blackColor];
 		_gridView.dayView = self;
@@ -479,6 +506,7 @@ static const CGFloat kCorner       = 5.0;
 @synthesize dayView=_dayView;
 @synthesize eventHeight=_eventHeight;
 @synthesize textFont=_textFont;
+@synthesize backgroundView = _backgroundView;
 
 - (BOOL)hasAllDayEvents {
 	for (id view in self.subviews) {
@@ -506,16 +534,20 @@ static const CGFloat kCorner       = 5.0;
 	return _day;
 }
 
-- (void)layoutSubviews {	
+- (void)layoutSubviews {
 	self.frame = CGRectMake(self.frame.origin.x,
 							self.frame.origin.y,
 							self.frame.size.width,
 							ALL_DAY_VIEW_EMPTY_SPACE + (ALL_DAY_VIEW_EMPTY_SPACE + self.eventHeight) * _eventCount);
 	
+    
 	self.dayView.gridView.frame =  CGRectMake(self.dayView.gridView.frame.origin.x, self.frame.size.height,
 											  self.dayView.gridView.frame.size.width, self.dayView.gridView.frame.size.height);
 	
-	self.dayView.scrollView.contentSize = CGSizeMake(self.dayView.scrollView.contentSize.width,
+    self.backgroundView.frame = CGRectOffset(CGRectInset(self.bounds, 24.0, 0.0), 26.0, 7.0);
+
+	
+    self.dayView.scrollView.contentSize = CGSizeMake(self.dayView.scrollView.contentSize.width,
 													 CGRectGetHeight(self.bounds) + CGRectGetHeight(self.dayView.gridView.bounds));
 	
 	for (id view in self.subviews) {
@@ -549,6 +581,15 @@ static const CGFloat kCorner       = 5.0;
 	
 	[self setNeedsLayout];
 	[self.dayView.gridView setNeedsLayout];
+}
+
+- (void)setBackgroundView:(UIImageView *)backgroundView {
+    [_backgroundView removeFromSuperview];
+    _backgroundView = backgroundView;
+    [_backgroundView setAutoresizingMask:UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth];
+    
+    [self addSubview:_backgroundView];
+    [self sendSubviewToBack:_backgroundView];
 }
 
 @end
