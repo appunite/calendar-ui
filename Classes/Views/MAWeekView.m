@@ -49,7 +49,7 @@ static const unsigned int ARROW_LEFT                          = 0;
 static const unsigned int ARROW_RIGHT                         = 1;
 static const unsigned int ARROW_WIDTH                         = 48;
 static const unsigned int ARROW_HEIGHT                        = 38;
-static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
+static const unsigned int TOP_BACKGROUND_HEIGHT               = 10;
 
 #define DATE_COMPONENTS (NSYearCalendarUnit| NSMonthCalendarUnit | NSDayCalendarUnit | NSWeekCalendarUnit |  NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit | NSWeekdayCalendarUnit | NSWeekdayOrdinalCalendarUnit)
 #define CURRENT_CALENDAR [NSCalendar currentCalendar]
@@ -192,9 +192,6 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 	[self.scrollView addSubview:self.allDayEventView];
 	[self.scrollView addSubview:self.hourView];
 	[self.scrollView addSubview:self.gridView];
-	
-	[self.gridView addGestureRecognizer:self.swipeLeftRecognizer];
-	[self.gridView addGestureRecognizer:self.swipeRightRecognizer];
 }
 
 - (void)layoutSubviews {
@@ -213,10 +210,10 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 									CGRectGetMinY(self.topBackground.bounds),
 									ARROW_WIDTH, ARROW_HEIGHT);
 	
-	self.dateLabel.frame = CGRectMake(CGRectGetMaxX(self.leftArrow.bounds),
-									  CGRectGetMinY(self.topBackground.bounds),
-									  CGRectGetWidth(self.topBackground.bounds) - CGRectGetWidth(self.leftArrow.bounds) - CGRectGetWidth(self.rightArrow.bounds),
-									  ARROW_HEIGHT);
+//	self.dateLabel.frame = CGRectMake(CGRectGetMaxX(self.leftArrow.bounds),
+//									  CGRectGetMinY(self.topBackground.bounds),
+//									  CGRectGetWidth(self.topBackground.bounds) - CGRectGetWidth(self.leftArrow.bounds) - CGRectGetWidth(self.rightArrow.bounds),
+//									  ARROW_HEIGHT);
 	
 	self.allDayEventView.frame = CGRectMake(sizeNecessary.width, 0,
 											CGRectGetWidth(self.bounds) - sizeNecessary.width,
@@ -298,7 +295,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 - (UIScrollView *)scrollView {
 	if (!_scrollView) {
 		_scrollView = [[UIScrollView alloc] init];
-		_scrollView.backgroundColor      = [UIColor whiteColor];
+		_scrollView.backgroundColor      = [UIColor clearColor];
 		_scrollView.scrollEnabled        = TRUE;
 		_scrollView.alwaysBounceVertical = TRUE;
 		_scrollView.canCancelContentTouches = NO;
@@ -309,7 +306,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 - (MAAllDayEventView *)allDayEventView {
 	if (!_allDayEventView) {
 		_allDayEventView = [[MAAllDayEventView alloc] init];
-		_allDayEventView.backgroundColor = [UIColor whiteColor];
+		_allDayEventView.backgroundColor = [UIColor clearColor];
 		_allDayEventView.weekView = self;
 		_allDayEventView.textFont = self.regularFont;
 	}
@@ -320,7 +317,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 	if (!_hourView) {
 		_hourView = [[MAHourView alloc] init];
 		_hourView.weekView        = self;
-		_hourView.backgroundColor = [UIColor whiteColor];
+		_hourView.backgroundColor = [UIColor clearColor];
 		_hourView.textColor       = [UIColor colorWithRed:0.6 green:0.6 blue:0.6 alpha:1.f];
 		_hourView.textFont        = self.boldFont;
 	}
@@ -343,7 +340,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 - (MAGridView *)gridView {
 	if (!_gridView){		
 		_gridView = [[MAGridView alloc] init];
-		_gridView.backgroundColor = [UIColor whiteColor];
+		_gridView.backgroundColor = [UIColor clearColor];
 		_gridView.rows            = HOURS_IN_DAY;
 		_gridView.columns         = DAYS_IN_WEEK;
 		_gridView.outerBorder     = YES;
